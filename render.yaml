@@ -1,0 +1,29 @@
+# Render Blueprint — Myndora Care API + PostgreSQL
+# https://render.com/docs/blueprint-spec
+
+databases:
+  - name: myndora-care-postgres-prod
+    plan: free
+    databaseName: myndora_care
+    user: myndora
+
+services:
+  - type: web
+    name: myndora-care-backend
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: myndora-care-postgres-prod
+          property: connectionString
+      - key: CORS_ORIGINS
+        sync: false
