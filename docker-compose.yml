@@ -1,31 +1,20 @@
-services:
-  mongodb:
-    image: mongo:7
-    container_name: vitalink-mongodb
-    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+﻿services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: vitalink-postgres
+    environment:
+      POSTGRES_USER: vitalink
+      POSTGRES_PASSWORD: vitalink_dev
+      POSTGRES_DB: vitalink_dev
     ports:
-      - "27017:27017"
+      - "5432:5432"
     volumes:
-      - mongodb_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U vitalink -d vitalink_dev"]
+      interval: 5s
       timeout: 5s
       retries: 5
-
-  mongo-init:
-    image: mongo:7
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    restart: "no"
-    entrypoint: >
-      bash -c "
-      mongosh --host mongodb:27017 --eval \"
-      try { rs.status() } catch(e) {
-        rs.initiate({_id:'rs0', members:[{_id:0, host:'mongodb:27017'}]})
-      }
-      \""
 
   redis:
     image: redis:7-alpine
@@ -38,49 +27,5 @@ services:
       timeout: 3s
       retries: 5
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: vitalink-backend
-    ports:
-      - "8080:8080"
-    env_file:
-      - .env
-    environment:
-      MONGODB_URI: mongodb://mongodb:27017/?replicaSet=rs0
-      REDIS_URL: redis://redis:6379
-      APP_ENV: development
-      MOCK_PAYSTACK: "true"
-      MOCK_AT: "true"
-      MOCK_GCS: "true"
-    volumes:
-      - ./backend:/app
-    depends_on:
-      mongo-init:
-        condition: service_completed_successfully
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-
-  web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile.dev
-    container_name: vitalink-web
-    ports:
-      - "5173:5173"
-    environment:
-      VITE_API_BASE_URL: http://localhost:8080/api/v1
-    volumes:
-      - ./web:/app
-      - /app/node_modules
-    depends_on:
-      - backend
-
 volumes:
-  mongodb_data:
+  postgres_data:

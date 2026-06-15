@@ -18,7 +18,7 @@ class PatientHomeScreen extends ConsumerWidget {
     final vitalsAsync = ref.watch(patientVitalsProvider(patientId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('VitaLink')),
+      appBar: AppBar(title: const Text('Myndora Care')),
       body: vitalsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -35,8 +35,8 @@ class PatientHomeScreen extends ConsumerWidget {
                 Text(
                   'Hello, $name',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -68,10 +68,17 @@ class PatientHomeScreen extends ConsumerWidget {
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                           if (latest.glucoseFasting != null)
-                            Text('Fasting glucose: ${latest.glucoseFasting} mg/dL'),
+                            Text(
+                              'Fasting glucose: ${latest.glucoseFasting} mg/dL',
+                            ),
                           Text(
-                            DateFormat.yMMMd().add_jm().format(latest.createdAt),
-                            style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                            DateFormat.yMMMd().add_jm().format(
+                              latest.createdAt,
+                            ),
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 12,
+                            ),
                           ),
                           if (latest.syncStatus.name != 'synced')
                             Padding(
@@ -94,8 +101,11 @@ class PatientHomeScreen extends ConsumerWidget {
                       padding: const EdgeInsets.all(24),
                       child: Column(
                         children: [
-                          Icon(Icons.monitor_heart_outlined,
-                              size: 48, color: Colors.grey.shade400),
+                          Icon(
+                            Icons.monitor_heart_outlined,
+                            size: 48,
+                            color: Colors.grey.shade400,
+                          ),
                           const SizedBox(height: 12),
                           const Text('No readings yet'),
                           const SizedBox(height: 8),
@@ -116,7 +126,9 @@ class PatientHomeScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 SizedBox(
                   height: 200,
-                  child: _BpChart(vitals: vitals.take(7).toList().reversed.toList()),
+                  child: _BpChart(
+                    vitals: vitals.take(7).toList().reversed.toList(),
+                  ),
                 ),
               ],
             ),
@@ -143,8 +155,10 @@ class _BpChart extends StatelessWidget {
     }
     if (spots.isEmpty) {
       return Center(
-        child: Text('Chart appears after BP readings',
-            style: TextStyle(color: Colors.grey.shade500)),
+        child: Text(
+          'Chart appears after BP readings',
+          style: TextStyle(color: Colors.grey.shade500),
+        ),
       );
     }
     return LineChart(

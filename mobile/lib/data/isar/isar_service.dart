@@ -1,6 +1,7 @@
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../features/vitals/data/models/vitals_queue_item.dart';
 import 'local_vital.dart';
 
 class IsarService {
@@ -12,9 +13,9 @@ class IsarService {
   static Future<IsarService> open() async {
     final dir = await getApplicationDocumentsDirectory();
     final isar = await Isar.open(
-      [LocalVitalSchema],
+      [LocalVitalSchema, VitalsQueueItemSchema],
       directory: dir.path,
-      name: 'vitalink',
+      name: 'myndora_care',
     );
     return IsarService(isar);
   }

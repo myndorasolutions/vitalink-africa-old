@@ -1,4 +1,4 @@
-# VitaLink Africa — Mobile
+# Myndora Care — Mobile
 
 Flutter app for patients, caregivers, and community health workers. Offline-first vitals with Isar local storage and background sync to the Go API.
 

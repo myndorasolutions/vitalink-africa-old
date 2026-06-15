@@ -1,4 +1,4 @@
-# VitaLink Africa API Contracts
+# Myndora Care API Contracts
 
 Base URL: `/api/v1`
 
@@ -43,6 +43,19 @@ Request: `{ "role": "patient", "full_name": "...", "phone": "...", ... }`
 Response includes `risk_status` and optional `alert_id`.
 
 ### GET /vitals/patient/:id/trend?days=7|30|90
+
+## Care service layers
+
+`platform_subscription` | `chw_remote_check` | `physical_chw_visit`
+
+### GET /subscriptions/patient/:patientId
+Returns patient subscription plan, status, and expiry.
+
+### POST /remote-checks
+Same body as `POST /vitals`; delegates with `source_type: patient_self` and returns `service_layer: chw_remote_check`.
+
+### POST /chw-visits
+Vitals body plus optional `visit_type` and `notes`; creates linked `CHWVisit` row and returns `service_layer: physical_chw_visit`.
 
 ## Service Jobs
 

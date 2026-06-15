@@ -31,7 +31,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           children: [
             const Spacer(),
             Image.asset(
-              'assets/images/vitalink_logo.jpeg',
+              'assets/images/myndora_care_logo5.jpeg',
               height: 120,
               errorBuilder: (_, _, _) => Icon(
                 Icons.favorite,
@@ -41,7 +41,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'VitaLink Africa',
+              'Myndora Care',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,

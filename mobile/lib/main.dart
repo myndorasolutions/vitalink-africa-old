@@ -25,12 +25,11 @@ Future<void> main() async {
         sharedPreferencesProvider.overrideWithValue(prefs),
         isarProvider.overrideWithValue(isarService.isar),
       ],
-      child: const _SyncBootstrap(child: VitaLinkApp()),
+      child: const _SyncBootstrap(child: MyndoraCareApp()),
     ),
   );
 }
 
-/// Triggers background sync when the app starts and after connectivity returns.
 class _SyncBootstrap extends ConsumerStatefulWidget {
   const _SyncBootstrap({required this.child});
 

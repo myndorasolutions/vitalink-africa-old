@@ -40,7 +40,9 @@ class PatientProfileScreen extends ConsumerWidget {
           Center(
             child: Text(name, style: Theme.of(context).textTheme.headlineSmall),
           ),
-          Center(child: Text(email, style: TextStyle(color: Colors.grey.shade600))),
+          Center(
+            child: Text(email, style: TextStyle(color: Colors.grey.shade600)),
+          ),
           const SizedBox(height: 24),
           _InfoTile(label: 'Plan', value: plan),
           _InfoTile(label: 'Language', value: lang),
@@ -50,9 +52,9 @@ class PatientProfileScreen extends ConsumerWidget {
             onTap: () async {
               await ref.read(syncServiceProvider).syncPending();
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Sync attempted')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Sync attempted')));
               }
             },
           ),
@@ -82,7 +84,10 @@ class _InfoTile extends StatelessWidget {
     return Card(
       child: ListTile(
         title: Text(label),
-        trailing: Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+        trailing: Text(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }

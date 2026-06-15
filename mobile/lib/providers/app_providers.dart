@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,10 +9,14 @@ import '../data/isar/isar_service.dart';
 import '../data/isar/local_vital.dart';
 import '../services/sync_service.dart';
 
-export '../core/api_client.dart' show apiClientProvider;
+export '../core/api_client.dart' show createApiClient;
 
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError('SharedPreferences must be overridden in main()');
+});
+
+final apiClientProvider = Provider<Dio>((ref) {
+  return createApiClient(ref.watch(sharedPreferencesProvider));
 });
 
 final isarProvider = Provider<Isar>((ref) {

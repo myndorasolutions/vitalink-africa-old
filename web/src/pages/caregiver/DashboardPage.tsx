@@ -12,7 +12,7 @@ export function CaregiverDashboardPage() {
 
   return (
     <>
-      <PageHeader title="Caregiver home" subtitle="Patients you support" />
+      <PageHeader title="Caregiver home" subtitle="Monitor vitals and support loved ones at home" />
       <div className="grid gap-4 md:grid-cols-2">
         {patients.map((p) => (
           <article key={p.id} className="card">

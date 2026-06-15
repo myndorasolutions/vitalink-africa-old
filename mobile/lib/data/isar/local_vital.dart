@@ -29,6 +29,9 @@ class LocalVital {
   String riskStatus = 'green';
   String sourceType = 'patient_self';
   String captureLocationType = 'home';
+  String serviceLayer = 'physical_chw_visit';
+  String verificationMethod = '';
+  bool verificationConfirmed = false;
 
   late DateTime createdAt;
   DateTime? syncedAt;

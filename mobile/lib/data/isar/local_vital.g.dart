@@ -77,39 +77,54 @@ const LocalVitalSchema = CollectionSchema(
       name: r'serverId',
       type: IsarType.string,
     ),
-    r'sourceType': PropertySchema(
+    r'serviceLayer': PropertySchema(
       id: 12,
+      name: r'serviceLayer',
+      type: IsarType.string,
+    ),
+    r'sourceType': PropertySchema(
+      id: 13,
       name: r'sourceType',
       type: IsarType.string,
     ),
     r'symptoms': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'symptoms',
       type: IsarType.stringList,
     ),
     r'syncError': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'syncError',
       type: IsarType.string,
     ),
     r'syncStatus': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'syncStatus',
       type: IsarType.string,
       enumMap: _LocalVitalsyncStatusEnumValueMap,
     ),
     r'syncedAt': PropertySchema(
-      id: 16,
+      id: 17,
       name: r'syncedAt',
       type: IsarType.dateTime,
     ),
     r'systolicBp': PropertySchema(
-      id: 17,
+      id: 18,
       name: r'systolicBp',
       type: IsarType.long,
     ),
+    r'verificationConfirmed': PropertySchema(
+      id: 19,
+      name: r'verificationConfirmed',
+      type: IsarType.bool,
+    ),
+    r'verificationMethod': PropertySchema(
+      id: 20,
+      name: r'verificationMethod',
+      type: IsarType.string,
+    ),
     r'weightKg': PropertySchema(
-      id: 18,
+      id: 21,
       name: r'weightKg',
       type: IsarType.double,
     )
@@ -159,6 +174,7 @@ int _localVitalEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  bytesCount += 3 + object.serviceLayer.length * 3;
   bytesCount += 3 + object.sourceType.length * 3;
   bytesCount += 3 + object.symptoms.length * 3;
   {
@@ -174,6 +190,7 @@ int _localVitalEstimateSize(
     }
   }
   bytesCount += 3 + object.syncStatus.name.length * 3;
+  bytesCount += 3 + object.verificationMethod.length * 3;
   return bytesCount;
 }
 
@@ -195,13 +212,16 @@ void _localVitalSerialize(
   writer.writeLong(offsets[9], object.pulse);
   writer.writeString(offsets[10], object.riskStatus);
   writer.writeString(offsets[11], object.serverId);
-  writer.writeString(offsets[12], object.sourceType);
-  writer.writeStringList(offsets[13], object.symptoms);
-  writer.writeString(offsets[14], object.syncError);
-  writer.writeString(offsets[15], object.syncStatus.name);
-  writer.writeDateTime(offsets[16], object.syncedAt);
-  writer.writeLong(offsets[17], object.systolicBp);
-  writer.writeDouble(offsets[18], object.weightKg);
+  writer.writeString(offsets[12], object.serviceLayer);
+  writer.writeString(offsets[13], object.sourceType);
+  writer.writeStringList(offsets[14], object.symptoms);
+  writer.writeString(offsets[15], object.syncError);
+  writer.writeString(offsets[16], object.syncStatus.name);
+  writer.writeDateTime(offsets[17], object.syncedAt);
+  writer.writeLong(offsets[18], object.systolicBp);
+  writer.writeBool(offsets[19], object.verificationConfirmed);
+  writer.writeString(offsets[20], object.verificationMethod);
+  writer.writeDouble(offsets[21], object.weightKg);
 }
 
 LocalVital _localVitalDeserialize(
@@ -224,15 +244,18 @@ LocalVital _localVitalDeserialize(
   object.pulse = reader.readLongOrNull(offsets[9]);
   object.riskStatus = reader.readString(offsets[10]);
   object.serverId = reader.readStringOrNull(offsets[11]);
-  object.sourceType = reader.readString(offsets[12]);
-  object.symptoms = reader.readStringList(offsets[13]) ?? [];
-  object.syncError = reader.readStringOrNull(offsets[14]);
+  object.serviceLayer = reader.readString(offsets[12]);
+  object.sourceType = reader.readString(offsets[13]);
+  object.symptoms = reader.readStringList(offsets[14]) ?? [];
+  object.syncError = reader.readStringOrNull(offsets[15]);
   object.syncStatus =
-      _LocalVitalsyncStatusValueEnumMap[reader.readStringOrNull(offsets[15])] ??
+      _LocalVitalsyncStatusValueEnumMap[reader.readStringOrNull(offsets[16])] ??
           SyncStatus.pending;
-  object.syncedAt = reader.readDateTimeOrNull(offsets[16]);
-  object.systolicBp = reader.readLongOrNull(offsets[17]);
-  object.weightKg = reader.readDoubleOrNull(offsets[18]);
+  object.syncedAt = reader.readDateTimeOrNull(offsets[17]);
+  object.systolicBp = reader.readLongOrNull(offsets[18]);
+  object.verificationConfirmed = reader.readBool(offsets[19]);
+  object.verificationMethod = reader.readString(offsets[20]);
+  object.weightKg = reader.readDoubleOrNull(offsets[21]);
   return object;
 }
 
@@ -270,18 +293,24 @@ P _localVitalDeserializeProp<P>(
     case 12:
       return (reader.readString(offset)) as P;
     case 13:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readString(offset)) as P;
     case 14:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 15:
+      return (reader.readStringOrNull(offset)) as P;
+    case 16:
       return (_LocalVitalsyncStatusValueEnumMap[
               reader.readStringOrNull(offset)] ??
           SyncStatus.pending) as P;
-    case 16:
-      return (reader.readDateTimeOrNull(offset)) as P;
     case 17:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 18:
+      return (reader.readLongOrNull(offset)) as P;
+    case 19:
+      return (reader.readBool(offset)) as P;
+    case 20:
+      return (reader.readString(offset)) as P;
+    case 21:
       return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1739,6 +1768,142 @@ extension LocalVitalQueryFilter
     });
   }
 
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      serviceLayerEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serviceLayer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      serviceLayerGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'serviceLayer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      serviceLayerLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'serviceLayer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      serviceLayerBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'serviceLayer',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      serviceLayerStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'serviceLayer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      serviceLayerEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'serviceLayer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      serviceLayerContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'serviceLayer',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      serviceLayerMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'serviceLayer',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      serviceLayerIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serviceLayer',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      serviceLayerIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'serviceLayer',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition> sourceTypeEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -2530,6 +2695,152 @@ extension LocalVitalQueryFilter
     });
   }
 
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationConfirmedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'verificationConfirmed',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationMethodEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'verificationMethod',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationMethodGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'verificationMethod',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationMethodLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'verificationMethod',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationMethodBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'verificationMethod',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationMethodStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'verificationMethod',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationMethodEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'verificationMethod',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationMethodContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'verificationMethod',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationMethodMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'verificationMethod',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationMethodIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'verificationMethod',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition>
+      verificationMethodIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'verificationMethod',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<LocalVital, LocalVital, QAfterFilterCondition> weightKgIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -2767,6 +3078,18 @@ extension LocalVitalQuerySortBy
     });
   }
 
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy> sortByServiceLayer() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceLayer', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy> sortByServiceLayerDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceLayer', Sort.desc);
+    });
+  }
+
   QueryBuilder<LocalVital, LocalVital, QAfterSortBy> sortBySourceType() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceType', Sort.asc);
@@ -2824,6 +3147,34 @@ extension LocalVitalQuerySortBy
   QueryBuilder<LocalVital, LocalVital, QAfterSortBy> sortBySystolicBpDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'systolicBp', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy>
+      sortByVerificationConfirmed() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'verificationConfirmed', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy>
+      sortByVerificationConfirmedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'verificationConfirmed', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy>
+      sortByVerificationMethod() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'verificationMethod', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy>
+      sortByVerificationMethodDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'verificationMethod', Sort.desc);
     });
   }
 
@@ -3002,6 +3353,18 @@ extension LocalVitalQuerySortThenBy
     });
   }
 
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy> thenByServiceLayer() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceLayer', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy> thenByServiceLayerDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serviceLayer', Sort.desc);
+    });
+  }
+
   QueryBuilder<LocalVital, LocalVital, QAfterSortBy> thenBySourceType() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceType', Sort.asc);
@@ -3059,6 +3422,34 @@ extension LocalVitalQuerySortThenBy
   QueryBuilder<LocalVital, LocalVital, QAfterSortBy> thenBySystolicBpDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'systolicBp', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy>
+      thenByVerificationConfirmed() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'verificationConfirmed', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy>
+      thenByVerificationConfirmedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'verificationConfirmed', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy>
+      thenByVerificationMethod() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'verificationMethod', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QAfterSortBy>
+      thenByVerificationMethodDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'verificationMethod', Sort.desc);
     });
   }
 
@@ -3156,6 +3547,13 @@ extension LocalVitalQueryWhereDistinct
     });
   }
 
+  QueryBuilder<LocalVital, LocalVital, QDistinct> distinctByServiceLayer(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'serviceLayer', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<LocalVital, LocalVital, QDistinct> distinctBySourceType(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -3192,6 +3590,21 @@ extension LocalVitalQueryWhereDistinct
   QueryBuilder<LocalVital, LocalVital, QDistinct> distinctBySystolicBp() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'systolicBp');
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QDistinct>
+      distinctByVerificationConfirmed() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'verificationConfirmed');
+    });
+  }
+
+  QueryBuilder<LocalVital, LocalVital, QDistinct> distinctByVerificationMethod(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'verificationMethod',
+          caseSensitive: caseSensitive);
     });
   }
 
@@ -3283,6 +3696,12 @@ extension LocalVitalQueryProperty
     });
   }
 
+  QueryBuilder<LocalVital, String, QQueryOperations> serviceLayerProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'serviceLayer');
+    });
+  }
+
   QueryBuilder<LocalVital, String, QQueryOperations> sourceTypeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'sourceType');
@@ -3316,6 +3735,20 @@ extension LocalVitalQueryProperty
   QueryBuilder<LocalVital, int?, QQueryOperations> systolicBpProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'systolicBp');
+    });
+  }
+
+  QueryBuilder<LocalVital, bool, QQueryOperations>
+      verificationConfirmedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'verificationConfirmed');
+    });
+  }
+
+  QueryBuilder<LocalVital, String, QQueryOperations>
+      verificationMethodProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'verificationMethod');
     });
   }
 

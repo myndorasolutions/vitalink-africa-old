@@ -22,6 +22,6 @@ export const useAuthStore = create<AuthState>()(
         return role ? roles.includes(role) : false;
       },
     }),
-    { name: 'vitalink-auth' },
+    { name: 'myndora-care-auth' },
   ),
 );

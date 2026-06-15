@@ -1,0 +1,400 @@
+// VitaLink Africa — PostgreSQL schema (Product Guide + Cursor Prompt)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums ---
+
+enum UserRole {
+  patient
+  caregiver
+  home_helper
+  chw
+  pharmacy
+  clinician
+  lab
+  admin
+  super_admin
+}
+
+enum VitalSourceType {
+  patient_self
+  caregiver_entry
+  home_helper_entry
+  chw_visit
+  pharmacy_walk_in
+  community_screening
+}
+
+enum CaptureLocationType {
+  home
+  pharmacy
+  community_event
+  clinic
+  unknown
+}
+
+enum ConditionType {
+  hypertension
+  diabetes
+  both
+}
+
+enum RiskStatus {
+  green
+  yellow
+  red
+}
+
+enum AlertType {
+  high_bp
+  high_glucose
+  missed_reading
+  missed_medication
+  symptom_escalation
+}
+
+enum AlertSeverity {
+  yellow
+  red
+}
+
+enum AlertStatus {
+  open
+  assigned
+  resolved
+  escalated
+}
+
+enum ConsentStatus {
+  pending
+  approved
+  revoked
+}
+
+enum ConsentType {
+  caregiver
+  home_helper
+  data_export
+}
+
+enum ConsentRecordStatus {
+  active
+  revoked
+}
+
+enum SubscriptionPlan {
+  free_check
+  basic_monitor
+  family_care
+  assisted_care
+  premium_chronic
+}
+
+enum SubscriptionStatus {
+  active
+  expired
+  cancelled
+  trial
+}
+
+enum MedicationType {
+  otc
+  prescription
+  controlled
+}
+
+enum PrescriptionStatus {
+  active
+  expired
+  cancelled
+}
+
+enum ProviderType {
+  chw
+  pharmacy
+  clinician
+  lab
+}
+
+enum VerificationStatus {
+  pending
+  verified
+  suspended
+}
+
+enum ServiceJobStatus {
+  booked
+  accepted
+  declined
+  in_progress
+  completed_pending
+  released
+  disputed
+  cancelled
+  refunded
+}
+
+enum EscrowStatus {
+  initialized
+  paid_held
+  accepted
+  completed_pending_confirmation
+  released
+  disputed
+  refunded
+}
+
+enum PaymentType {
+  subscription
+  service
+  refund
+}
+
+enum PaymentStatus {
+  pending
+  success
+  failed
+  refunded
+}
+
+enum PayoutStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+enum PharmacyRefillStatus {
+  requested
+  approved
+  ready
+  fulfilled
+  cancelled
+}
+
+enum CHWVisitType {
+  routine
+  urgent
+  missed_reading_followup
+}
+
+enum LabOrderStatus {
+  ordered
+  scheduled
+  sample_collected
+  resulted
+  abnormal_flagged
+}
+
+enum DisputeStatus {
+  open
+  under_review
+  resolved_refund
+  resolved_release
+  closed
+}
+
+enum PolicyViolationType {
+  off_platform_solicitation
+  prescription_bypass
+  identity_fraud
+}
+
+enum PolicyViolationStatus {
+  pending_review
+  actioned
+  dismissed
+}
+
+enum MessagePolicyAction {
+  blocked
+  warned
+  logged
+}
+
+enum NotificationChannel {
+  sms
+  whatsapp
+  push
+  in_app
+}
+
+enum NotificationStatus {
+  queued
+  sent
+  failed
+  delivered
+}
+
+
+// --- Identity & RBAC ---
+
+model User {
+  id                 String    @id @default(cuid())
+  firebaseUid        String    @unique @map("firebase_uid")
+  email              String    @unique
+  phone              String
+  role               UserRole
+  fullName           String    @map("full_name")
+  languagePreference String    @default("en") @map("language_preference")
+  isActive           Boolean   @default(true) @map("is_active")
+  mfaEnabled         Boolean   @default(false) @map("mfa_enabled")
+  lastLogin          DateTime? @map("last_login")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  patientProfile              Patient?
+  caregiverLinks              CaregiverPatient[] @relation("CaregiverUser")
+  vitalsCaptured              Vital[]            @relation("CapturedBy")
+  consentGranted              ConsentRecord[]    @relation("ConsentGrantee")
+  patientsAssignedChw         Patient[]          @relation("AssignedCHW")
+  patientsAssignedPharmacy    Patient[]          @relation("AssignedPharmacy")
+  patientsAssignedClinician   Patient[]          @relation("AssignedClinician")
+
+  @@index([role])
+  @@map("users")
+}
+
+model Patient {
+  id                    String             @id @default(cuid())
+  userId                String             @unique @map("user_id")
+  fullName              String             @map("full_name")
+  age                   Int
+  gender                String
+  dob                   DateTime?
+  city                  String
+  state                 String
+  lga                   String
+  address               String?
+  lat                   Float?
+  lng                   Float?
+  conditions            ConditionType[]
+  emergencyContactName  String             @map("emergency_contact_name")
+  emergencyContactPhone String             @map("emergency_contact_phone")
+  emergencyRelationship String             @map("emergency_relationship")
+  subscriptionPlan      SubscriptionPlan?  @map("subscription_plan")
+  subscriptionStatus    SubscriptionStatus @default(trial) @map("subscription_status")
+  subscriptionExpiresAt DateTime?          @map("subscription_expires_at")
+  assignedChwId         String?            @map("assigned_chw_id")
+  assignedPharmacyId    String?            @map("assigned_pharmacy_id")
+  assignedClinicianId   String?            @map("assigned_clinician_id")
+  isActive              Boolean            @default(true) @map("is_active")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+
+  user              User               @relation(fields: [userId], references: [id])
+  assignedChw       User?              @relation("AssignedCHW", fields: [assignedChwId], references: [id])
+  assignedPharmacy  User?              @relation("AssignedPharmacy", fields: [assignedPharmacyId], references: [id])
+  assignedClinician User?              @relation("AssignedClinician", fields: [assignedClinicianId], references: [id])
+  caregiverLinks    CaregiverPatient[]
+  authorizedHelpers AuthorizedHelper[]
+  vitals            Vital[]
+  chwVisits         CHWVisit[]
+  consentRecords    ConsentRecord[]
+
+  @@map("patients")
+}
+
+model CaregiverPatient {
+  id               String        @id @default(cuid())
+  caregiverUserId  String        @map("caregiver_user_id")
+  patientId        String        @map("patient_id")
+  consentStatus    ConsentStatus @default(pending) @map("consent_status")
+  consentGrantedAt DateTime?     @map("consent_granted_at")
+  consentRevokedAt DateTime?     @map("consent_revoked_at")
+  relationship     String
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  caregiver User    @relation("CaregiverUser", fields: [caregiverUserId], references: [id])
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([caregiverUserId, patientId])
+  @@map("caregivers_patients")
+}
+
+model AuthorizedHelper {
+  id            String        @id @default(cuid())
+  patientId     String        @map("patient_id")
+  helperName    String        @map("helper_name")
+  phone         String
+  relationship  String
+  consentStatus ConsentStatus @default(pending) @map("consent_status")
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, phone])
+  @@map("authorized_helpers")
+}
+
+model ConsentRecord {
+  id              String              @id @default(cuid())
+  patientId       String              @map("patient_id")
+  grantedToUserId String              @map("granted_to_user_id")
+  consentType     ConsentType         @map("consent_type")
+  version         String
+  status          ConsentRecordStatus @default(active)
+  grantedAt       DateTime            @default(now()) @map("granted_at")
+  revokedAt       DateTime?           @map("revoked_at")
+  ipAddress       String?             @map("ip_address")
+
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  grantee   User    @relation("ConsentGrantee", fields: [grantedToUserId], references: [id])
+
+  @@map("consent_records")
+}
+
+model Vital {
+  id                  String              @id @default(cuid())
+  patientId           String              @map("patient_id")
+  systolicBp          Int?                @map("systolic_bp")
+  diastolicBp         Int?                @map("diastolic_bp")
+  pulse               Int?
+  glucoseFasting      Float?              @map("glucose_fasting")
+  glucoseRandom       Float?              @map("glucose_random")
+  weightKg            Float?              @map("weight_kg")
+  symptoms            String[]
+  medicationTaken     Boolean             @default(false) @map("medication_taken")
+  notes               String?
+  riskStatus          RiskStatus          @map("risk_status")
+  sourceType          VitalSourceType     @map("source_type")
+  capturedByUserId    String              @map("captured_by_user_id")
+  captureLocationType CaptureLocationType @map("capture_location_type")
+  patientConsented    Boolean             @default(true) @map("patient_consented")
+  createdAt           DateTime            @default(now()) @map("created_at")
+
+  patient     Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  capturedBy  User       @relation("CapturedBy", fields: [capturedByUserId], references: [id])
+  chwVisits   CHWVisit[]
+
+  @@index([patientId, createdAt])
+  @@map("vitals")
+}
+
+model CHWVisit {
+  id                String       @id @default(cuid())
+  patientId         String       @map("patient_id")
+  chwId             String       @map("chw_id")
+  jobId             String?      @map("job_id")
+  visitType         CHWVisitType @map("visit_type")
+  visitDate         DateTime     @map("visit_date")
+  vitalsCaptured    Boolean      @default(false) @map("vitals_captured")
+  vitalId           String?      @map("vital_id")
+  notes             String
+  escalated         Boolean      @default(false)
+  escalationReason  String?      @map("escalation_reason")
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  vital   Vital?  @relation(fields: [vitalId], references: [id])
+
+  @@index([patientId, visitDate])
+  @@map("chw_visits")
+}
+

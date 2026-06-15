@@ -1,5 +1,5 @@
-name: vitalink_africa
-description: VitaLink Africa — offline-first health vitals for patients, caregivers, and CHWs.
+name: myndora_care
+description: Myndora Care — offline-first chronic care for patients, caregivers, and CHWs.
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -24,6 +24,7 @@ dependencies:
   path_provider: ^2.1.5
   shared_preferences: ^2.5.3
   uuid: ^4.5.1
+  audioplayers: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -35,5 +36,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/vitalink_logo.jpeg
     - assets/images/myndora_logo.png
+    - assets/images/myndora_care_logo5.jpeg
+    - assets/audio/yoruba/

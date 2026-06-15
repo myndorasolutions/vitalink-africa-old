@@ -53,6 +53,7 @@ class SyncService {
         'notes': vital.notes,
         'source_type': vital.sourceType,
         'capture_location_type': vital.captureLocationType,
+        if (vital.serviceLayer.isNotEmpty) 'service_layer': vital.serviceLayer,
       });
 
       final data = response.data;

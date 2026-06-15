@@ -1,0 +1,20 @@
+﻿{
+  "name": "myndora-care",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "web",
+    "shared"
+  ],
+  "scripts": {
+    "dev:backend": "npm run start:dev -w backend",
+    "dev:web": "npm run dev -w web",
+    "db:up": "docker compose up -d postgres redis",
+    "db:migrate": "npm run prisma:migrate:dev -w backend",
+    "db:generate": "npm run prisma:generate -w backend",
+    "db:studio": "npm run prisma:studio -w backend"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -23,7 +23,7 @@ class RoleSelectScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(20),
         children: [
           Text(
-            'How will you use VitaLink?',
+            'How will you use Myndora Care?',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 24),

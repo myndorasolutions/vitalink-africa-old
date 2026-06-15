@@ -27,15 +27,23 @@ class _ServiceBookingScreenState extends State<ServiceBookingScreen> {
         children: [
           Text('Service type', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
-          ..._services.map((s) {
-            return RadioListTile<String>(
-              title: Text(s.$2),
-              subtitle: Text(s.$3),
-              value: s.$1,
-              groupValue: _serviceType,
-              onChanged: (v) => setState(() => _serviceType = v!),
-            );
-          }),
+          RadioGroup<String>(
+            groupValue: _serviceType,
+            onChanged: (value) {
+              if (value != null) setState(() => _serviceType = value);
+            },
+            child: Column(
+              children: _services
+                  .map(
+                    (s) => RadioListTile<String>(
+                      title: Text(s.$2),
+                      subtitle: Text(s.$3),
+                      value: s.$1,
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
           const Divider(height: 32),
           ListTile(
             leading: const Icon(Icons.calendar_today),
@@ -58,7 +66,10 @@ class _ServiceBookingScreenState extends State<ServiceBookingScreen> {
             title: const Text('Time'),
             subtitle: Text(_time.format(context)),
             onTap: () async {
-              final picked = await showTimePicker(context: context, initialTime: _time);
+              final picked = await showTimePicker(
+                context: context,
+                initialTime: _time,
+              );
               if (picked != null) setState(() => _time = picked);
             },
           ),
@@ -67,7 +78,9 @@ class _ServiceBookingScreenState extends State<ServiceBookingScreen> {
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Booking request saved — payment step connects to Paystack'),
+                  content: Text(
+                    'Booking request saved — payment step connects to Paystack',
+                  ),
                 ),
               );
               Navigator.pop(context);

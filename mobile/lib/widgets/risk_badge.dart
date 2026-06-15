@@ -9,7 +9,7 @@ class RiskBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = VitaLinkTheme.riskColor(status);
+    final color = MyndoraCareTheme.riskColor(status);
     final label = status.toUpperCase();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

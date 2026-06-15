@@ -1,6 +1,6 @@
-# VitaLink Africa
+# Myndora Care
 
-Nigeria-first chronic care coordination platform for hypertension and diabetes management.
+Nigeria-first chronic care coordination platform for hypertension and diabetes management. A core product under **Myndora Solutions**.
 
 ## Architecture
 
@@ -55,19 +55,30 @@ go run cmd/server/main.go
 go run cmd/seed/main.go
 ```
 
-### 5. Web
+### 5. Web & API (monorepo)
 ```bash
-cd web
 npm install
-npm run dev
+npm run dev:backend   # NestJS API on :8080 (uses backend/dist)
+npm run dev:web       # Vite dashboard on :5173
+```
+
+Or from package folders:
+```bash
+cd web && npm install && npm run dev
 ```
 
 ### 6. Mobile
 ```bash
 cd mobile
 flutter pub get
-dart run build_runner build
-flutter run
+dart run build_runner build --delete-conflicting-outputs
+flutter analyze
+flutter run --dart-define=INTEGRATION_FLOW=true --dart-define=API_BASE_URL=http://10.0.2.2:8080/api/v1
+```
+
+Closed-test bundle (requires working Gradle/Java trust store):
+```bash
+flutter build appbundle --dart-define=INTEGRATION_FLOW=true --dart-define=API_BASE_URL=http://YOUR_LAN_IP:8080/api/v1
 ```
 
 ## Demo Credentials
@@ -76,16 +87,16 @@ Password for all accounts: `DemoPass123!`
 
 | Role | Email |
 |------|-------|
-| Patient (Yellow) | grace.patient@vitalink.demo |
-| Patient (Green) | musa.patient@vitalink.demo |
-| Patient (Red) | esther.patient@vitalink.demo |
-| Caregiver | tunde.caregiver@vitalink.demo |
-| CHW | amina.chw@vitalink.demo |
-| Pharmacy | pharmacy@vitalink.demo |
-| Clinician | doctor@vitalink.demo |
-| Lab | lab@vitalink.demo |
-| Admin | admin@vitalink.demo |
-| Super Admin | superadmin@vitalink.demo |
+| Patient (Yellow) | grace.patient@myndora.demo |
+| Patient (Green) | musa.patient@myndora.demo |
+| Patient (Red) | esther.patient@myndora.demo |
+| Caregiver | tunde.caregiver@myndora.demo |
+| CHW | amina.chw@myndora.demo |
+| Pharmacy | pharmacy@myndora.demo |
+| Clinician | doctor@myndora.demo |
+| Lab | lab@myndora.demo |
+| Admin | admin@myndora.demo |
+| Super Admin | superadmin@myndora.demo |
 
 ## API
 

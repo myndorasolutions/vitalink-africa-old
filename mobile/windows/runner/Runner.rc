@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.myndora.vitalink" "\0"
-            VALUE "FileDescription", "vitalink_africa" "\0"
+            VALUE "CompanyName", "com.myndoracare.app" "\0"
+            VALUE "FileDescription", "Myndora Care Application" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "vitalink_africa" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.myndora.vitalink. All rights reserved." "\0"
-            VALUE "OriginalFilename", "vitalink_africa.exe" "\0"
-            VALUE "ProductName", "vitalink_africa" "\0"
+            VALUE "InternalName", "myndora_care" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Myndora Care. All rights reserved." "\0"
+            VALUE "OriginalFilename", "myndora_care.exe" "\0"
+            VALUE "ProductName", "Myndora Care" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
