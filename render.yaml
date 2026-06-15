@@ -13,8 +13,8 @@ services:
     runtime: docker
     plan: free
     region: oregon
-    dockerContext: ./backend
-    dockerfilePath: Dockerfile
+    dockerContext: .
+    dockerfilePath: backend/Dockerfile
     healthCheckPath: /api/v1/health
     envVars:
       - key: NODE_ENV

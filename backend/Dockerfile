@@ -1,12 +1,12 @@
-# Multi-stage build — dockerContext: ./backend (flat paths, no monorepo workspace files)
+# Multi-stage build — dockerContext: . (repo root); COPY paths prefixed with backend/
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-COPY prisma ./prisma/
-COPY src ./src/
-COPY tsconfig.json tsconfig.build.json nest-cli.json ./
+COPY backend/package.json backend/package-lock.json ./
+COPY backend/prisma ./prisma/
+COPY backend/src ./src/
+COPY backend/tsconfig.json backend/tsconfig.build.json backend/nest-cli.json ./
 
 RUN npm ci && npx prisma generate && npm run build
 
@@ -16,8 +16,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY package.json package-lock.json ./
-COPY prisma ./prisma/
+COPY backend/package.json backend/package-lock.json ./
+COPY backend/prisma ./prisma/
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
